@@ -39,12 +39,6 @@ var submitCmd = &cobra.Command{
 			fmt.Println("git url needed")
 			return
 		}
-		if submitArgs.Gang {
-			if submitArgs.GangSchedulerName == "" {
-				fmt.Println("use default gang scheduler name: gang-scheduler")
-				submitArgs.GangSchedulerName = "gang-scheduler"
-			}
-		}
 		parts := strings.Split(strings.Trim(submitArgs.GitUrl, "/"), "/")
 		submitArgs.GitRepoName = strings.Split(parts[len(parts)-1], ".git")[0]
 		if len(submitArgs.Commands) == 0 {
@@ -67,12 +61,12 @@ func init() {
 	}
 	rootCmd.AddCommand(submitCmd)
 	submitCmd.Flags().StringVar(&submitArgs.NameSpace, "ns", "", "MPI Job Namespace")
-	submitCmd.Flags().IntVarP(&submitArgs.NumWorkers, "numWorkers", "n", 1, "Number of Workers")
+	submitCmd.Flags().IntVarP(&submitArgs.NumWorkers, "numWorkers", "n", 2, "Number of Workers")
 	submitCmd.Flags().StringVarP(&submitArgs.GitUrl, "gitUrl", "i", "", "git repo link for sync code")
 	submitCmd.Flags().StringVar(&submitArgs.WorkDir, "wd", ".", "working directory under project")
 	submitCmd.Flags().StringArrayVarP(&submitArgs.Commands, "commands", "c", []string{}, "entry point")
 	submitCmd.Flags().BoolVar(&submitArgs.PipInstall, "pip", false, "whether needed to run pip install requirements.txt for workers")
 	submitCmd.Flags().IntVar(&submitArgs.GpuPerWorker, "gpu", 1, "number of gpu allocated for each workers")
 	submitCmd.Flags().BoolVar(&submitArgs.Gang, "gang", false, "whether use gang scheduler")
-	submitCmd.Flags().StringVar(&submitArgs.GangSchedulerName, "gangSchedulerName", "", "gang scheduler name")
+	submitCmd.Flags().StringVar(&submitArgs.GangSchedulerName, "gangSchedulerName", "gang-scheduler", "gang scheduler name")
 }

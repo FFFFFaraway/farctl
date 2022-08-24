@@ -1,21 +1,23 @@
 # must overwrite
-name: "default-mpijob"
-namespace: "default"
-numWorkers: 3
-gitUrl: https://github.com/FFFFFaraway/sample-python-train.git
-commands:
-- python generate_data.py
-- python main.py
+#name: "default-mpijob"
+#namespace: "default"
+# TODO: numWorkers need to be > 1. (some bugs TODO)
+#numWorkers: 3
+#gitUrl: https://github.com/FFFFFaraway/sample-python-train.git
+#commands:
+#- python generate_data.py
+#- python main.py
+# gitRepoName: sample-python-train
+# TODO: Our Operator only support one gpu per worker
+#gpuPerWorker: 1
+#pipInstall: false
+#gang: false
+#gangSchedulerName: gang-scheduler
+#workDir: .
 
 # better to have a look
 masterImage: farawaya/horovod-torch-cpu
 workerImage: farawaya/horovod-torch-cuda113
-# gitRepoName: MPI-Operator
-gpuPerWorker: 1
-pipInstall: false
-gang: false
-gangSchedulerName: gang-scheduler
-workDir: .
 
 masterTolerations: [ ]
 #  - effect: NoSchedule
