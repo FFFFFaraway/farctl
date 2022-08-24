@@ -1,0 +1,54 @@
+apiVersion: batch.test.bdap.com/v1
+kind: MPIJob
+metadata:
+  name: {{ .Values.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "mpijob.labels" . | nindent 4 }}
+spec:
+  numWorkers: {{ .Values.numWorkers }}
+  launcherTemplate:
+    spec:
+      restartPolicy: Never
+      containers:
+        - args:
+            - git clone {{ .Values.gitUrl }} &&
+              cd {{ .Values.gitRepoName }} &&
+              cd {{ .Values.workDir }} &&
+              horovodrun -np {{ .Values.numWorkers }} --hostfile $OMPI_MCA_orte_default_hostfile {{ .Values.command }}
+          command:
+            - /bin/sh
+            - -c
+          image: {{ .Values.masterImage }}
+          name: master
+      {{- with .Values.masterTolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  workerTemplate:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - args:
+            - git clone {{ .Values.gitUrl }} &&
+              cd {{ .Values.gitRepoName }} &&
+              cd {{ .Values.workDir }} &&
+              {{- if .Values.pipInstall }}
+              pip install -r requirements.txt &&
+              {{- end }}
+              touch /ready.txt &&
+              sleep infinity
+          command:
+            - /bin/sh
+            - -c
+          image: {{ .Values.workerImage }}
+          name: worker
+          resources:
+            limits:
+              nvidia.com/gpu: {{ .Values.gpuPerWorker }}
+          readinessProbe:
+            {{- toYaml .Values.workerReadinessProbe | nindent 12 }}
+      {{- with .Values.workerTolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

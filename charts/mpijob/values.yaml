@@ -1,0 +1,30 @@
+# must overwrite
+name: "default-mpijob"
+namespace: "default"
+numWorkers: 3
+gitUrl: https://github.com/FFFFFaraway/MPI-Operator.git
+workDir: ./sample-python-train
+command: python main.py
+pipInstall: false
+gpuPerWorker: 1
+
+# by default
+masterImage: farawaya/horovod-torch-cpu
+workerImage: farawaya/horovod-torch-cuda113
+# gitRepoName: MPI-Operator
+
+masterTolerations: [ ]
+#  - effect: NoSchedule
+#    key: gpu
+#    operator: Exists
+workerTolerations:
+  - effect: NoSchedule
+    key: gpu
+    operator: Exists
+workerReadinessProbe:
+  exec:
+    command:
+      - cat
+      - /ready.txt
+  initialDelaySeconds: 30
+  periodSeconds: 5
