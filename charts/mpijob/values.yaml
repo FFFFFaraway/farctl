@@ -3,17 +3,19 @@ name: "default-mpijob"
 namespace: "default"
 numWorkers: 3
 gitUrl: https://github.com/FFFFFaraway/sample-python-train.git
-workDir: .
 commands:
 - python generate_data.py
 - python main.py
-pipInstall: false
-gpuPerWorker: 1
 
-# by default
+# better to have a look
 masterImage: farawaya/horovod-torch-cpu
 workerImage: farawaya/horovod-torch-cuda113
 # gitRepoName: MPI-Operator
+gpuPerWorker: 1
+pipInstall: false
+gang: false
+gangSchedulerName: gang-scheduler
+workDir: .
 
 masterTolerations: [ ]
 #  - effect: NoSchedule
@@ -30,3 +32,5 @@ workerReadinessProbe:
       - /ready.txt
   initialDelaySeconds: 30
   periodSeconds: 5
+
+scheduleTimeoutSeconds: 20

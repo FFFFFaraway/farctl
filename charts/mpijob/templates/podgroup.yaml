@@ -1,0 +1,10 @@
+{{- if .Values.gang }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.name }}-pg
+  namespace: {{ .Values.namespace }}
+data:
+  minAvailable: {{ .Values.numWorkers }}
+  scheduleTimeoutSeconds: {{ .Values.scheduleTimeoutSeconds }}
+{{- end }}

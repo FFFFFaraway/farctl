@@ -28,7 +28,15 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
   workerTemplate:
+    {{- if .Values.gang }}
+    metadata:
+      labels:
+        pod-group.scheduling.bdap.com/podgroup-configmap: {{ .Values.name }}-pg
+    {{- end }}
     spec:
+      {{- if .Values.gang }}
+      schedulerName: {{ .Values.gangSchedulerName }}
+      {{- end }}
       restartPolicy: OnFailure
       containers:
         - args:
