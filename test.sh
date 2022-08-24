@@ -1,1 +1,1 @@
-myctl submit test --ns sw -i https://github.com/FFFFFaraway/MPI-Operator.git --wd ./sample-python-train -c "python main.py"
+farctl submit test --ns sw -i https://github.com/FFFFFaraway/sample-python-train.git --wd . -c "python generate_data.py" -c "python main.py"

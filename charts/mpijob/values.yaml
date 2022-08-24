@@ -2,9 +2,11 @@
 name: "default-mpijob"
 namespace: "default"
 numWorkers: 3
-gitUrl: https://github.com/FFFFFaraway/MPI-Operator.git
-workDir: ./sample-python-train
-command: python main.py
+gitUrl: https://github.com/FFFFFaraway/sample-python-train.git
+workDir: .
+commands:
+- python generate_data.py
+- python main.py
 pipInstall: false
 gpuPerWorker: 1
 

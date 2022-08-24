@@ -8,15 +8,15 @@ import (
 )
 
 type SubmitArgs struct {
-	Name         string `yaml:"name"`
-	NameSpace    string `yaml:"namespace"`
-	NumWorkers   int    `yaml:"numWorkers"`
-	GitUrl       string `yaml:"gitUrl"`
-	GitRepoName  string `yaml:"gitRepoName"`
-	WorkDir      string `yaml:"workDir"`
-	Command      string `yaml:"command"`
-	PipInstall   bool   `yaml:"pipInstall"`
-	GpuPerWorker int    `yaml:"gpuPerWorker"`
+	Name         string   `yaml:"name"`
+	NameSpace    string   `yaml:"namespace"`
+	NumWorkers   int      `yaml:"numWorkers"`
+	GitUrl       string   `yaml:"gitUrl"`
+	GitRepoName  string   `yaml:"gitRepoName"`
+	WorkDir      string   `yaml:"workDir"`
+	Commands     []string `yaml:"commands"`
+	PipInstall   bool     `yaml:"pipInstall"`
+	GpuPerWorker int      `yaml:"gpuPerWorker"`
 }
 
 var submitArgs SubmitArgs
@@ -39,7 +39,7 @@ var submitCmd = &cobra.Command{
 		}
 		parts := strings.Split(strings.Trim(submitArgs.GitUrl, "/"), "/")
 		submitArgs.GitRepoName = strings.Split(parts[len(parts)-1], ".git")[0]
-		if submitArgs.Command == "" {
+		if len(submitArgs.Commands) == 0 {
 			fmt.Println("command needed")
 			return
 		}
@@ -62,7 +62,7 @@ func init() {
 	submitCmd.Flags().IntVarP(&submitArgs.NumWorkers, "numWorkers", "n", 1, "Number of Workers")
 	submitCmd.Flags().StringVarP(&submitArgs.GitUrl, "gitUrl", "i", "", "git repo link for sync code")
 	submitCmd.Flags().StringVar(&submitArgs.WorkDir, "wd", ".", "working directory under project")
-	submitCmd.Flags().StringVarP(&submitArgs.Command, "command", "c", "", "entry point")
+	submitCmd.Flags().StringArrayVarP(&submitArgs.Commands, "commands", "c", []string{}, "entry point")
 	submitCmd.Flags().BoolVar(&submitArgs.PipInstall, "pip", false, "whether needed to run pip install requirements.txt for workers")
 	submitCmd.Flags().IntVar(&submitArgs.GpuPerWorker, "gpu", 1, "number of gpu allocated for each workers")
 }

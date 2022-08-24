@@ -11,7 +11,7 @@ import (
 
 var helmCmd = []string{"helm"}
 
-const chartName = "https://github.com/FFFFFaraway/MPI-Operator/raw/main/charts/mpijob/mpijob-0.1.0.tgz"
+const chartName = "https://github.com/FFFFFaraway/farctl/raw/main/charts/mpijob/mpijob-0.1.0.tgz"
 
 func InstallRelease(name string, namespace string, values interface{}) error {
 	binary, err := exec.LookPath(helmCmd[0])

@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var name string
+var names []string
 
 // helloCmd represents the hello command
 var helloCmd = &cobra.Command{
@@ -14,11 +14,13 @@ var helloCmd = &cobra.Command{
 	Short: "hello world",
 	Long:  `hello world again`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("hello", name)
+		for _, n := range names {
+			fmt.Println("hello", n)
+		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(helloCmd)
-	helloCmd.Flags().StringVarP(&name, "Name", "n", "world", "Your name")
+	helloCmd.Flags().StringArrayVarP(&names, "Name", "n", []string{"world"}, "Your name")
 }
