@@ -7,7 +7,7 @@ import (
 )
 
 type DeleteArgs struct {
-	NameSpace string
+	Namespace string
 }
 
 var deleteArgs DeleteArgs
@@ -19,12 +19,15 @@ var deleteCmd = &cobra.Command{
 	Long:  `delete a mpi job`,
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		err := utils.GetNamespace(deleteArgs.NameSpace)
+		if err := utils.InitKubeClient(); err != nil {
+			return
+		}
+		err := utils.GetNamespace(deleteArgs.Namespace)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		if err := utils.DeleteRelease(args[0], deleteArgs.NameSpace); err != nil {
+		if err := utils.DeleteRelease(args[0], deleteArgs.Namespace); err != nil {
 			return
 		}
 	},
@@ -32,5 +35,5 @@ var deleteCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(deleteCmd)
-	deleteCmd.Flags().StringVar(&deleteArgs.NameSpace, "ns", "farctl", "MPI Job Namespace")
+	deleteCmd.Flags().StringVar(&deleteArgs.Namespace, "ns", "farctl", "MPI Job Namespace")
 }
