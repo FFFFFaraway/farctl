@@ -6,7 +6,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var namespace string
+type DeleteArgs struct {
+	NameSpace string
+}
+
+var deleteArgs DeleteArgs
 
 // deleteCmd represents the delete command
 var deleteCmd = &cobra.Command{
@@ -15,16 +19,12 @@ var deleteCmd = &cobra.Command{
 	Long:  `delete a mpi job`,
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		if namespace == "" {
-			fmt.Println("namespace needed")
-			return
-		}
-		err := utils.GetNamespace(namespace)
+		err := utils.GetNamespace(deleteArgs.NameSpace)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		if err := utils.DeleteRelease(args[0], namespace); err != nil {
+		if err := utils.DeleteRelease(args[0], deleteArgs.NameSpace); err != nil {
 			return
 		}
 	},
@@ -32,5 +32,5 @@ var deleteCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(deleteCmd)
-	deleteCmd.Flags().StringVar(&namespace, "ns", "", "MPI Job Namespace")
+	deleteCmd.Flags().StringVar(&deleteArgs.NameSpace, "ns", "farctl", "MPI Job Namespace")
 }

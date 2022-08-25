@@ -1,14 +1,17 @@
 package utils
 
 import (
+	"bufio"
 	"context"
 	"flag"
+	"io"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
+	"os"
 	"path/filepath"
 )
 
@@ -36,6 +39,22 @@ func EnsureNamespace(ns string) error {
 			return err
 		}
 	}
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func GetPodLog(name, ns string, follow bool) error {
+	req := clientset.CoreV1().Pods(ns).GetLogs(name, &v1.PodLogOptions{
+		Follow: follow,
+	})
+	r, err := req.Stream(context.TODO())
+	if err != nil {
+		return err
+	}
+	buf := bufio.NewWriter(os.Stdout)
+	_, err = io.Copy(buf, r)
 	if err != nil {
 		return err
 	}

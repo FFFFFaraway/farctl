@@ -31,10 +31,6 @@ var submitCmd = &cobra.Command{
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		submitArgs.Name = args[0]
-		if submitArgs.NameSpace == "" {
-			fmt.Println("namespace needed")
-			return
-		}
 		if submitArgs.GitUrl == "" {
 			fmt.Println("git url needed")
 			return
@@ -43,6 +39,9 @@ var submitCmd = &cobra.Command{
 		submitArgs.GitRepoName = strings.Split(parts[len(parts)-1], ".git")[0]
 		if len(submitArgs.Commands) == 0 {
 			fmt.Println("command needed")
+			return
+		}
+		if err := utils.InitKubeClient(); err != nil {
 			return
 		}
 		if err := utils.EnsureNamespace(submitArgs.NameSpace); err != nil {
@@ -56,11 +55,8 @@ var submitCmd = &cobra.Command{
 }
 
 func init() {
-	if err := utils.InitKubeClient(); err != nil {
-		return
-	}
 	rootCmd.AddCommand(submitCmd)
-	submitCmd.Flags().StringVar(&submitArgs.NameSpace, "ns", "", "MPI Job Namespace")
+	submitCmd.Flags().StringVar(&submitArgs.NameSpace, "ns", "farctl", "MPI Job Namespace")
 	submitCmd.Flags().IntVarP(&submitArgs.NumWorkers, "numWorkers", "n", 2, "Number of Workers")
 	submitCmd.Flags().StringVarP(&submitArgs.GitUrl, "gitUrl", "i", "", "git repo link for sync code")
 	submitCmd.Flags().StringVar(&submitArgs.WorkDir, "wd", ".", "working directory under project")
