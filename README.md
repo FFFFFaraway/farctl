@@ -38,10 +38,10 @@ go install github.com/FFFFFaraway/farctl@latest
 
    - Test is the name of the submitted MPIJob
    - -i denote the url of git clone
-   - -c denote multiple commands as entry points
-   - -gang means we use [gang scheduler](https://github.com/FFFFFaraway/gang-scheduler). But you'll need to install it before use it.
-   - -n means the number of workers to create
-   - Others options can be found by typing `farctl submit -h`
+   - -c denote the command as entry point. we can have multiple commands by using multiple -c
+   - -gang denote we'll use [gang scheduler](https://github.com/FFFFFaraway/gang-scheduler). But it's needed a extra installation.
+   - -n denote the number of workers to be created
+   - Other options can be found by typing `farctl submit -h`
 
 ## List MPIJob
 
