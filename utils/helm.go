@@ -79,6 +79,24 @@ func DeleteRelease(name, namespace string) error {
 	return nil
 }
 
+func GetReleaseValue(name, namespace string) error {
+	binary, err := exec.LookPath(helmCmd[0])
+	if err != nil {
+		return err
+	}
+
+	args := []string{"get", "values", name, "-n", namespace}
+
+	cmd := exec.Command(binary, args...)
+	out, err := cmd.CombinedOutput()
+	fmt.Println("")
+	fmt.Printf("%s\n", string(out))
+	if err != nil {
+		log.Fatalf("Failed to execute %s, %v with %v", binary, args, err)
+	}
+	return nil
+}
+
 func toYaml(values interface{}, file *os.File) error {
 	log.Debugf("values: %+v", values)
 	data, err := yaml.Marshal(values)

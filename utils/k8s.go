@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"context"
 	"flag"
+	batchv1 "github.com/FFFFFaraway/MPI-Operator/api/batch.test.bdap.com/v1"
+	"github.com/FFFFFaraway/MPI-Operator/client/clientset/versioned"
 	"io"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -15,15 +17,18 @@ import (
 	"path/filepath"
 )
 
-var clientset *kubernetes.Clientset
+var (
+	mpijobClientset *versioned.Clientset
+	clientset       *kubernetes.Clientset
+)
 
-func createNamespace(client *kubernetes.Clientset, namespace string) error {
+func createNamespace(namespace string) error {
 	ns := &v1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: namespace,
 		},
 	}
-	_, err := client.CoreV1().Namespaces().Create(context.TODO(), ns, metav1.CreateOptions{})
+	_, err := clientset.CoreV1().Namespaces().Create(context.TODO(), ns, metav1.CreateOptions{})
 	return err
 }
 
@@ -35,7 +40,7 @@ func GetNamespace(ns string) error {
 func EnsureNamespace(ns string) error {
 	err := GetNamespace(ns)
 	if err != nil && errors.IsNotFound(err) {
-		if err = createNamespace(clientset, ns); err != nil {
+		if err = createNamespace(ns); err != nil {
 			return err
 		}
 	}
@@ -43,6 +48,14 @@ func EnsureNamespace(ns string) error {
 		return err
 	}
 	return nil
+}
+
+func GetMPIJob(name, ns string) (*batchv1.MPIJob, error) {
+	return mpijobClientset.BatchV1().MPIJobs(ns).Get(context.TODO(), name, metav1.GetOptions{})
+}
+
+func ListMPIJob(ns string) (*batchv1.MPIJobList, error) {
+	return mpijobClientset.BatchV1().MPIJobs(ns).List(context.TODO(), metav1.ListOptions{})
 }
 
 func GetPodLog(name, ns string, follow bool) error {
@@ -78,5 +91,6 @@ func InitKubeClient() error {
 
 	// create the clientset
 	clientset, err = kubernetes.NewForConfig(config)
+	mpijobClientset, err = versioned.NewForConfig(config)
 	return err
 }

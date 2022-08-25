@@ -38,5 +38,5 @@ var logCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(logCmd)
 	logCmd.Flags().StringVar(&logArgs.NameSpace, "ns", "farctl", "MPI Job Namespace")
-	logCmd.Flags().BoolVarP(&logArgs.Follow, "follow", "w", false, "Whether follow the log")
+	logCmd.Flags().BoolVarP(&logArgs.Follow, "follow", "w", true, "Whether follow the log")
 }
