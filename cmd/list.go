@@ -26,12 +26,12 @@ var listCmd = &cobra.Command{
 			fmt.Println(err)
 			return
 		}
-
 		mpiJobs, err := utils.ListMPIJob(listArgs.Namespace)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
+
 		utils.PrintMPIJobList(mpiJobs)
 	},
 }
