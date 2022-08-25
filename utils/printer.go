@@ -8,11 +8,12 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"os"
 	"text/tabwriter"
+	"time"
 )
 
 func PrintMPIJobList(mpijobs *batchv1.MPIJobList) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-	_, _ = fmt.Fprintln(w, "Namespace\tName\tReadyWorkers/Total\tLauncherStatus\tCreationTimestamp")
+	_, _ = fmt.Fprintln(w, "Namespace\tName\tReadyWorkers/Total\tLauncherStatus\tAge")
 	for _, mpijob := range mpijobs.Items {
 		ss, err := clientset.AppsV1().StatefulSets(mpijob.Namespace).Get(context.TODO(), mpijob.Name+"-worker", metav1.GetOptions{})
 		if err != nil {
@@ -36,7 +37,8 @@ func PrintMPIJobList(mpijobs *batchv1.MPIJobList) {
 			ss.Status.ReadyReplicas,
 			ss.Status.Replicas,
 			launcherStatus,
-			mpijob.CreationTimestamp)
+			time.Since(mpijob.CreationTimestamp.Time).Round(time.Second),
+		)
 	}
 	_ = w.Flush()
 }
