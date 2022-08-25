@@ -8,7 +8,7 @@ import (
 )
 
 type LogArgs struct {
-	NameSpace string
+	Namespace string
 	Follow    bool
 }
 
@@ -25,18 +25,18 @@ var logCmd = &cobra.Command{
 		if err := utils.InitKubeClient(); err != nil {
 			return
 		}
-		err := utils.GetNamespace(logArgs.NameSpace)
+		err := utils.GetNamespace(logArgs.Namespace)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 		podName := name + "-launcher"
-		_ = utils.GetPodLog(podName, logArgs.NameSpace, logArgs.Follow)
+		_ = utils.GetPodLog(podName, logArgs.Namespace, logArgs.Follow)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(logCmd)
-	logCmd.Flags().StringVar(&logArgs.NameSpace, "ns", "farctl", "MPI Job Namespace")
+	logCmd.Flags().StringVar(&logArgs.Namespace, "ns", "farctl", "MPI Job Namespace")
 	logCmd.Flags().BoolVarP(&logArgs.Follow, "follow", "w", true, "Whether follow the log")
 }

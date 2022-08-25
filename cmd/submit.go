@@ -9,7 +9,7 @@ import (
 
 type SubmitArgs struct {
 	Name              string   `yaml:"name"`
-	NameSpace         string   `yaml:"namespace"`
+	Namespace         string   `yaml:"namespace"`
 	NumWorkers        int      `yaml:"numWorkers"`
 	GitUrl            string   `yaml:"gitUrl"`
 	GitRepoName       string   `yaml:"gitRepoName"`
@@ -44,10 +44,10 @@ var submitCmd = &cobra.Command{
 		if err := utils.InitKubeClient(); err != nil {
 			return
 		}
-		if err := utils.EnsureNamespace(submitArgs.NameSpace); err != nil {
+		if err := utils.EnsureNamespace(submitArgs.Namespace); err != nil {
 			return
 		}
-		if err := utils.InstallRelease(submitArgs.Name, submitArgs.NameSpace, submitArgs); err != nil {
+		if err := utils.InstallRelease(submitArgs.Name, submitArgs.Namespace, submitArgs); err != nil {
 			fmt.Println("helm install error", err)
 			return
 		}
@@ -56,7 +56,7 @@ var submitCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(submitCmd)
-	submitCmd.Flags().StringVar(&submitArgs.NameSpace, "ns", "farctl", "MPI Job Namespace")
+	submitCmd.Flags().StringVar(&submitArgs.Namespace, "ns", "farctl", "MPI Job Namespace")
 	submitCmd.Flags().IntVarP(&submitArgs.NumWorkers, "numWorkers", "n", 2, "Number of Workers")
 	submitCmd.Flags().StringVarP(&submitArgs.GitUrl, "gitUrl", "i", "", "git repo link for sync code")
 	submitCmd.Flags().StringVar(&submitArgs.WorkDir, "wd", ".", "working directory under project")
