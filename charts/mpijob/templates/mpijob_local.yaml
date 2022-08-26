@@ -43,7 +43,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - args:
-          - while ! cd {{ .Values.localRepoName }}; do echo "Waiting code directory"; sleep 3; done
+          - while ! cd {{ .Values.localRepoName }}; do echo "Waiting code directory"; sleep 3; done &&
             {{- if ne .Values.workDir "." }}
             cd {{ .Values.workDir }} &&
             {{- end}}
