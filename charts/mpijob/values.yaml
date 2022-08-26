@@ -1,14 +1,15 @@
 # must overwrite
 #name: "default-mpijob"
 #namespace: "default"
-# TODO: numWorkers need to be > 1. (some bugs TODO)
+## TODO: numWorkers need to be > 1. (some bugs TODO)
 #numWorkers: 3
-#gitUrl: https://github.com/FFFFFaraway/sample-python-train.git
+##gitUrl: https://github.com/FFFFFaraway/sample-python-train.git
+#localUrl: .
 #commands:
 #- python generate_data.py
 #- python main.py
-# gitRepoName: sample-python-train
-# TODO: Our Operator only support one gpu per worker
+#gitRepoName: sample-python-train
+## TODO: Our Operator only support one gpu per worker
 #gpuPerWorker: 1
 #pipInstall: false
 #gang: false
@@ -36,3 +37,4 @@ workerReadinessProbe:
   periodSeconds: 5
 
 scheduleTimeoutSeconds: 20
+localRepoName: local-repo
