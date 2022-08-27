@@ -12,9 +12,11 @@
 ## Requirements
 
 - Kubernetes cluster. You can use [KIND](https://sigs.k8s.io/kind) to get a local cluster.
-- [kubectl]([Install Tools | Kubernetes](https://kubernetes.io/docs/tasks/tools/))
-- [helm]([Helm | Installing Helm](https://helm.sh/docs/intro/install/))
-- [Golang]([Download and install - The Go Programming Language](https://go.dev/doc/install))
+- kubectl: [Install Tools | Kubernetes](https://kubernetes.io/docs/tasks/tools/)
+- helm: [Helm | Installing Helm](https://helm.sh/docs/intro/install/)
+- Golang: [Download and install - The Go Programming Language](https://go.dev/doc/install)
+- [MPI Operator](https://github.com/FFFFFaraway/MPI-Operator) in your Kubernetes cluster
+- [gang Scheduler](https://github.com/FFFFFaraway/gang-scheduler) (Optional)
 
 ## Installation
 
@@ -28,7 +30,7 @@ go install github.com/FFFFFaraway/farctl@latest
 
 1. You'll need to write deep learning code using horovod. For example [here](https://github.com/FFFFFaraway/sample-python-train)
 
-2. You'll need to upload the code to some public available platform like [github](https://github.com), or [gitlab](https://about.gitlab.com), so that the container could pull the code down.
+2. (Optional) You can upload the code to some public available platform like [github](https://github.com), or [gitlab](https://about.gitlab.com)
 
 3. Submit the job, for example:
 
@@ -37,11 +39,17 @@ go install github.com/FFFFFaraway/farctl@latest
    ```
 
    - Test is the name of the submitted MPIJob
-   - -i denote the url of git clone
+   - -i denote the url of git clone, or the local directory path (default: . )
    - -c denote the command as entry point. we can have multiple commands by using multiple -c
    - -gang denote we'll use [gang scheduler](https://github.com/FFFFFaraway/gang-scheduler). But it's needed a extra installation.
    - -n denote the number of workers to be created
    - Other options can be found by typing `farctl submit -h`
+
+3. Another example use local code directory, it will first copy . (current directory) recursively to all worker pods:
+
+   ```bash
+   farctl submit local-test -c "echo ab" -c "echo cd"
+   ```
 
 ## List MPIJob
 
