@@ -30,8 +30,12 @@ var logCmd = &cobra.Command{
 			fmt.Println(err)
 			return
 		}
-		podName := name + "-launcher"
-		_ = utils.GetPodLog(podName, logArgs.Namespace, logArgs.Follow)
+		mpijob, err := utils.GetMPIJob(name, submitArgs.Namespace)
+		if err != nil {
+			fmt.Println("get mpijob error:", err)
+			return
+		}
+		utils.PrintMPIJobLog(mpijob, logArgs.Follow)
 	},
 }
 

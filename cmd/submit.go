@@ -34,10 +34,6 @@ var submitCmd = &cobra.Command{
 		submitArgs.Name = args[0]
 		parts := strings.Split(strings.Trim(submitArgs.GitUrl, "/"), "/")
 		submitArgs.GitRepoName = strings.Split(parts[len(parts)-1], ".git")[0]
-		if len(submitArgs.Commands) == 0 {
-			fmt.Println("command needed")
-			return
-		}
 		if err := utils.InitKubeClient(); err != nil {
 			return
 		}
@@ -45,20 +41,20 @@ var submitCmd = &cobra.Command{
 			return
 		}
 		if err := utils.InstallRelease(submitArgs.Name, submitArgs.Namespace, submitArgs); err != nil {
-			fmt.Println("helm install error", err)
+			fmt.Println("helm install error:", err)
 			return
 		}
-		fmt.Println("local files uploading...")
-		utils.WaitPodRunning(submitArgs.Name, submitArgs.Namespace, submitArgs.NumWorkers)
-		for i := 0; i < submitArgs.NumWorkers; i++ {
-			podName := fmt.Sprintf("%v-worker-%v", submitArgs.Name, i)
-			_, out, _, err := utils.KubectlCp(submitArgs.LocalUrl, podName+":/local-repo", "worker", submitArgs.Namespace)
-			if err != nil {
-				fmt.Printf("%v\n", err)
-			}
-			fmt.Println("out:")
-			fmt.Printf("%s", out.String())
+		mpijob, err := utils.GetMPIJob(submitArgs.Name, submitArgs.Namespace)
+		if err != nil {
+			fmt.Println("get mpijob error:", err)
+			return
 		}
+		err = utils.WaitMPIJobPodRunning(mpijob)
+		if err != nil {
+			fmt.Println("wait mpijob pods running error:", err)
+			return
+		}
+		utils.CopyLocalRepoToMPIJob(submitArgs.LocalUrl, mpijob)
 	},
 }
 
@@ -76,7 +72,7 @@ func init() {
 	}
 
 	submitCmd.Flags().StringVar(&submitArgs.WorkDir, "wd", ".", "working directory under project")
-	submitCmd.Flags().StringArrayVarP(&submitArgs.Commands, "commands", "c", []string{}, "entry point")
+	submitCmd.Flags().StringArrayVarP(&submitArgs.Commands, "commands", "c", []string{"echo hello world"}, "entry point")
 	submitCmd.Flags().BoolVar(&submitArgs.PipInstall, "pip", false, "whether needed to run pip install requirements.txt for workers")
 	submitCmd.Flags().IntVar(&submitArgs.GpuPerWorker, "gpu", 1, "number of gpu allocated for each workers")
 	submitCmd.Flags().BoolVar(&submitArgs.Gang, "gang", false, "whether use gang scheduler")

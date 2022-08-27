@@ -6,9 +6,8 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	batchv1 "github.com/FFFFFaraway/MPI-Operator/api/batch.test.bdap.com/v1"
-	"github.com/FFFFFaraway/MPI-Operator/client/clientset/versioned"
 	"io"
+	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -21,13 +20,11 @@ import (
 	cmdutil "k8s.io/kubectl/pkg/cmd/util"
 	"os"
 	"path/filepath"
-	"time"
 )
 
 var (
-	config          *rest.Config
-	mpijobClientset *versioned.Clientset
-	clientset       *kubernetes.Clientset
+	config    *rest.Config
+	clientset *kubernetes.Clientset
 )
 
 func createNamespace(namespace string) error {
@@ -58,15 +55,15 @@ func EnsureNamespace(ns string) error {
 	return nil
 }
 
-func GetMPIJob(name, ns string) (*batchv1.MPIJob, error) {
-	return mpijobClientset.BatchV1().MPIJobs(ns).Get(context.TODO(), name, metav1.GetOptions{})
+func GetPod(name, ns string) (*v1.Pod, error) {
+	return clientset.CoreV1().Pods(ns).Get(context.TODO(), name, metav1.GetOptions{})
 }
 
-func ListMPIJob(ns string) (*batchv1.MPIJobList, error) {
-	return mpijobClientset.BatchV1().MPIJobs(ns).List(context.TODO(), metav1.ListOptions{})
+func GetStatefulSet(name, ns string) (*appsv1.StatefulSet, error) {
+	return clientset.AppsV1().StatefulSets(ns).Get(context.TODO(), name, metav1.GetOptions{})
 }
 
-func GetPodLog(name, ns string, follow bool) error {
+func PrintPodLog(name, ns string, follow bool) error {
 	req := clientset.CoreV1().Pods(ns).GetLogs(name, &v1.PodLogOptions{
 		Follow: follow,
 	})
@@ -100,32 +97,11 @@ func InitKubeClient() error {
 
 	// create the clientset
 	clientset, err = kubernetes.NewForConfig(config)
-	mpijobClientset, err = versioned.NewForConfig(config)
-	return err
-}
-
-func WaitPodRunning(name, ns string, numWorkers int) {
-	fmt.Printf("waiting for %v workers container to be created...\n", numWorkers)
-	for {
-		time.Sleep(10 * time.Second)
-		exit := true
-		for i := 0; i < numWorkers; i++ {
-			podName := fmt.Sprintf("%v-worker-%v", name, i)
-			pod, err := clientset.CoreV1().Pods(ns).Get(context.TODO(), podName, metav1.GetOptions{})
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-			if pod.Status.Phase != "Running" {
-				fmt.Printf("worker %v is not running\n", podName)
-				exit = false
-				break
-			}
-		}
-		if exit {
-			return
-		}
+	if err != nil {
+		panic(err.Error())
 	}
+	mpijobClientset, err = NewMPIClient()
+	return err
 }
 
 // KubectlCp copied from https://stackoverflow.com/questions/51686986/how-to-copy-file-to-container-with-kubernetes-client-go
